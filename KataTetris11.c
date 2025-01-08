@@ -3,7 +3,8 @@
 // Игра тетрис (не работает пока)
 //
 // дата теста: 06.01.2025
-//
+// дата теста: 08.01.2025 - снова на JDoodle, попробовал разные функции очистки экрана - не ок
+// зато разобрался как рабоатет функция генерации игрового поля
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,6 +49,11 @@ void newPiece() {
 // Функция для очистки экрана
 void clearScreen() {
     system("cls");
+     system("clear"); // clear output screen
+    char a[80];
+printf("\033[2J"); /* Clear the entire screen. */
+printf("\033[0;0f"); /* Move cursor to the top left hand corner */
+fflush(stdin);
 }
 
 // Функция для рисования игрового поля
@@ -56,7 +62,7 @@ void drawField() {
     for (i = 0; i < N; ++i) {
         for (j = 0; j < N; ++j) {
             if (i < 4 || j < 4) {
-                printf("#");
+                printf("%%");
             } else {
                 printf(" ");
             }
@@ -117,9 +123,9 @@ void gameLogic() {
 void main() {
     srand(time(NULL));
     clearScreen();
-    drawField();
+   // drawField();
     
-    while (1) {
+    /*while (1)*/ {
         gameLogic();
         drawField();
         
@@ -133,6 +139,7 @@ void main() {
                     newPiece();
                     break;
             }
+                clearScreen();
         }
         
         // Задержка для анимации
