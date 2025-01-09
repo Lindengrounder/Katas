@@ -1,12 +1,15 @@
-/*второй блин комом 
-дата теста 07.01.2025*/
+// KataTetris12.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
+// дата теста: 07.01.2025 - второй блин комом 
+//             09.01.2025 - Тестирование в Visual Studio - разобрался со sleep, но пока не получается чистить экран
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <unistd.h>
+#include "windows.h" //для windows
+//#include <unistd.h> // для linux
+//#include "conio.h"
 
 #define N 20
-
 
 // Матрица для игрового поля
 char board[N][N];
@@ -47,8 +50,15 @@ void newPiece() {
 // Функция для очистки экрана
 void clearScreen() {
     // Можно использовать библиотеку curses или написать свою функцию для очистки экрана
-    fprintf(stderr, "\0332J\0331;1H"); // ANSI escape sequences for clearing screen
+    //fprintf(stderr, "\0332J\0331;1H"); // ANSI escape sequences for clearing screen
     // В Linux: system("clear");
+    system("cls");
+    //clrscr();
+    //system("clear"); // clear output screen
+    //char a[80];
+    //printf("\033[2J"); /* Clear the entire screen. */
+    //printf("\033[0;0f"); /* Move cursor to the top left hand corner */
+    //fflush(stdin);
 }
 
 // Функция для рисования игрового поля
@@ -58,7 +68,8 @@ void drawField() {
         for (j = 0; j < N; ++j) {
             if (i < 4 || j < 4) {
                 printf("#");
-            } else {
+            }
+            else {
                 printf(" ");
             }
         }
@@ -129,43 +140,32 @@ int main() {
     while (1) {
         gameLogic();
         drawField();
-        //        if (kbhit()) 
-{
-            switch ( 1 /*getch()*/ ) {
-                case 'q':
-                    exit(0);
-                    break;
-                case 'r':
-                    newPiece();
-                    break;
+              //  if (kbhit()) 
+        {
+            switch (1 /*getch()*/) {
+            case 'q':
+                exit(0);
+                break;
+            case 'r':
+                newPiece();
+                break;
             }
         }
-        
+
         // Задержка для анимации
-     //   sleep(1);
+       Sleep(2000);
     }
-    
- //   return 0;
+
+    //   return 0;
 }
-/* 
-Welcome to JDoodle!
 
-You can execute code here in 88 languages. Right now you’re in the C IDE.
+// Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
+// Отладка программы: F5 или меню "Отладка" > "Запустить отладку"
 
-  1. Click the orange Execute button ▶ to execute the sample code below and see how it works.
-
-  2. Want help writing or debugging code? Type a query into JDroid on the right hand side ---------------->
-
-  3. Try the menu buttons on the left. Save your file, share code with friends and open saved projects.
-
-Want to change languages? Try the search bar up the top. 
-*/
-/*
-#include<stdio.h>
-
-int main() {
-    int x=10;
-    int y=25;
-    int z=x+y;
-    printf("Sum of x+y = %i", z);
-}*/
+// Советы по началу работы 
+//   1. В окне обозревателя решений можно добавлять файлы и управлять ими.
+//   2. В окне Team Explorer можно подключиться к системе управления версиями.
+//   3. В окне "Выходные данные" можно просматривать выходные данные сборки и другие сообщения.
+//   4. В окне "Список ошибок" можно просматривать ошибки.
+//   5. Последовательно выберите пункты меню "Проект" > "Добавить новый элемент", чтобы создать файлы кода, или "Проект" > "Добавить существующий элемент", чтобы добавить в проект существующие файлы кода.
+//   6. Чтобы снова открыть этот проект позже, выберите пункты меню "Файл" > "Открыть" > "Проект" и выберите SLN-файл.
