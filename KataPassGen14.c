@@ -1,6 +1,6 @@
 /* протестировал в Code::Bloks 20.03
 компилятор gcc (GCC) 14.2.0
-10.01.2025 - дата теста: Есть ошибка, генерит только из символов пароль*/
+10.01.2025 - дата теста*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,7 +8,7 @@
 #include <string.h>
 
 // Набор символов для генерации пароля
-char symbols[] = "@!$+=-_?*()";
+char symbols[] = "@!$+=-_?*()0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 // Функция для генерации случайного пароля
 char *generate_password(int length) {
