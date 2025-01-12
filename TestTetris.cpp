@@ -1,4 +1,10 @@
-﻿#include <iostream>
+/* Тетрис на Си++
+Дата теста 12.01.2025 - протестировано в IDE Code::Blocks 20:03
+компилятор - gcc (GCC) 14.2.0
+Управление: стрелки влево и вправо для движения фигуры,
+A и D для поворота
+*/
+#include <iostream>
 #include <string>
 #include <chrono>
 #include <windows.h>
@@ -14,7 +20,7 @@ private:
     static const int fieldSize = 23;
 
     //  Это полу отрисовываем
-    std::string field[fieldSize] = 
+    std::string field[fieldSize] =
     {
         "|          |            \n",
         "|          |            \n",
@@ -86,7 +92,7 @@ public:
         for (auto line : field)
         {
             i++;
-            //  
+            //
             switch (i)
             {
                 //  В этих 4-х строках указывается следующая фигура
@@ -128,7 +134,7 @@ public:
                 {
                     field[y+figY][x+figX] = '%';
                 }
-            }                
+            }
         }
     }
 
@@ -161,7 +167,7 @@ public:
             for (int figX = 0; figX < strSize; figX++)
             {
                 if ((fig[figY][figX] == '%') && ((field[y+figY][x+figX] == '|') || (field[y+figY][x+figX] == '%')))
-                    return true;  
+                    return true;
             }
         }
         return false;
@@ -229,7 +235,7 @@ public:
                 if ((fullField[fieY - 1][fieX] == ' ') && (fieY == 19)) //  Если поле над удалённым кирпичом свободно, и это самый низ поля (19),
                     fullField[fieY][fieX] = '_';                        //  то нужно отрисовывать пол (_)
                 else
-                    fullField[fieY][fieX] = fullField[fieY - 1][fieX];  
+                    fullField[fieY][fieX] = fullField[fieY - 1][fieX];
             }
         }
     }
@@ -266,11 +272,11 @@ public:
 
 private:
     static const int figureSize = 4;    //  4 - чтобы влезла палка
-    std::string* figure = new std::string[figureSize];   
+    std::string* figure = new std::string[figureSize];
     int positionX;
     int positionY;
     figureName name;
-   
+
     //  Это всё лучше бы вынести куда-нибудь отдельно
     std::string figI[figureSize] =
     {
@@ -444,10 +450,10 @@ public:
             for (int i = 0; i < figureSize; i++)
                 figure[i] = "%%%%";
             break;
-        }       
+        }
     }
     ~Figure()   //  Проверить деструктор, потому что кажется, что что-то не так
-    {           
+    {
         delete[] figure;
     }
 
@@ -758,7 +764,7 @@ int main()
     int x = 4;
     int y = 0;
 
-    //  Время на поворот, сдвиг и движение фигуры в милисекундах 
+    //  Время на поворот, сдвиг и движение фигуры в милисекундах
     int timeForRotate = 150;
     int timeForMove = 75;
     int gameSpeed = 300;
@@ -772,7 +778,7 @@ int main()
     int nextFig = rand() % 7;
 
     while (isGame)
-    {      
+    {
         Figure figure(static_cast<Figure::figureName>(nextFig));
         nextFig = rand() % 7;
 
@@ -782,7 +788,7 @@ int main()
         auto timeEnd = std::chrono::system_clock::now();
         auto timeCheckEndRot = std::chrono::system_clock::now();
         auto timeCheckEndMove = std::chrono::system_clock::now();
-        
+
         //  В это цикле живёт одна фигура
         while (!(tetris.isFloorCollision(x, y, figure.getFigure(), figure.getSize()) || (tetris.isDownBrickCollision(x, y, figure.getFigure(), figure.getSize()))))
         {
@@ -827,7 +833,7 @@ int main()
 
             //  Удаляем фигуру с кадра
             tetris.ClearField();
-            
+
             //  Минипуляции со счётом, уровнем и кадром при заполнении строки
             const std::string* test = tetris.getFullField();
             for(int i = 1; i < 20; i++)
@@ -842,10 +848,10 @@ int main()
                     }
                 }
 
-            system("cls"); 
-            
+            system("cls");
+
         }
-        
+
         //  Проверяем не проиграли ли мы
         for (int i = 1; i < 11; i++)        //  1-11 - ширина поля
         {
