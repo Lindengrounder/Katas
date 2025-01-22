@@ -11,7 +11,6 @@
 //    Обработка ошибок: Программа проверяет на деление на ноль и сообщает об ошибке, если это происходит.
 // Этот код демонстрирует простоту и мощь императивного программирования, где каждый шаг явно указывается и контролируется программой.
 
-
 program NumericalMethods;
 
 { Программа для демонстрации числовых методов с использованием императивной парадигмы программирования }
@@ -39,7 +38,7 @@ type
   
   { Определение типа данных для меню }
   MenuItem = record
-    label: string;
+    labelText: string;  { Переименовали поле в labelText }
     method: Method;
   end;
   
@@ -48,26 +47,26 @@ var
   currentMethod: Method;
   num1, num2: Number;
   result: real;
-  choice: integer;
+  choice, i: integer;
   
 { Инициализация пунктов меню }
 procedure InitializeMenu;
 var
   i: integer;
 begin
-  menuItems[1].label := 'Сложение';
+  menuItems[1].labelText := 'Сложение';
   menuItems[1].method.name := 'Addition';
   menuItems[1].method.operation := Addition;
   
-  menuItems[2].label := 'Вычитание';
+  menuItems[2].labelText := 'Вычитание';
   menuItems[2].method.name := 'Subtraction';
   menuItems[2].method.operation := Subtraction;
   
-  menuItems[3].label := 'Умножение';
+  menuItems[3].labelText := 'Умножение';
   menuItems[3].method.name := 'Multiplication';
   menuItems[3].method.operation := Multiplication;
   
-  menuItems[4].label := 'Деление';
+  menuItems[4].labelText := 'Деление';
   menuItems[4].method.name := 'Division';
   menuItems[4].method.operation := Division;
 end;
@@ -83,10 +82,17 @@ begin
   
   { Отображение меню }
   for i := 1 to MAX_MENU_ITEMS do
-    WriteLn(i:2, '. ', menuItems[i].label);
+    WriteLn(i:2, '. ', menuItems[i].labelText);  { Используем labelText }
   
   Write('Ваш выбор: ');
   ReadLn(choice);
+
+  { Проверка корректности выбора }
+  if (choice < 1) or (choice > MAX_MENU_ITEMS) then
+  begin
+    WriteLn('Неверный выбор! Пожалуйста, выберите пункт от 1 до ', MAX_MENU_ITEMS);
+    Halt;  { Завершаем программу, если выбор неверный }
+  end;
   
   { Выполнение выбранной операции }
   currentMethod := menuItems[choice].method;
@@ -108,3 +114,7 @@ begin
   WriteLn('Результат: ', result:0:2);
   ReadLn; { Пауза для просмотра результата }
 end.
+
+//Изменения:
+
+//    Поле label было переименовано в labelText в структуре MenuItem, чтобы избежать конфликта с зарезервированным словом label.
