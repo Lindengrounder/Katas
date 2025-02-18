@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* Осенняя тематика */
+        body {
+            background-color: #fff3e6;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Кнопка отладки слева */
+        .debug-button {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 15px 25px;
+            background-color: #ff9933;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            transition: 0.3s;
+        }
+
+        .debug-button:hover {
+            background-color: #ff8000;
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        /* Сообщение о подтверждении */
+        .debug-message {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Кнопка отладки -->
+    <button class="debug-button" onclick="startDebug()">🔧 Осенняя отладка</button>
+    
+    <!-- Сообщение после отладки -->
+    <div id="debugConfirmation" class="debug-message">
+        Отладка успешно завершена! 🍁
+    </div>
+
+    <script>
+        function startDebug() {
+            // Симуляция процесса отладки
+            setTimeout(() => {
+                document.getElementById('debugConfirmation').style.display = 'block';
+                
+                // Автоматическое скрытие сообщения
+                setTimeout(() => {
+                    document.getElementById('debugConfirmation').style.display = 'none';
+                }, 3000);
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
