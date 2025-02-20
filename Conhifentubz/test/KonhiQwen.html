@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Стратегическая игра</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f4f4f4;
+  }
+  .game-container {
+    display: grid;
+    grid-template-columns: repeat(4, 100px);
+    grid-gap: 5px;
+    justify-content: center;
+    margin: 20px;
+  }
+  .cell {
+    width: 100px;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid black;
+    position: relative;
+    background-color: white;
+  }
+  .blue { background-color: #0000F9; color: white; }
+  .orange { background-color: #FEA700; color: black; }
+  .red { background-color: #FA0000; color: white; }
+  .green { background-color: #00B700; color: white; }
+  .info-panel {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: white;
+    width: 300px;
+  }
+  .controls {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .controls input, .controls button {
+    margin: 5px;
+    padding: 5px;
+  }
+</style>
+</head>
+<body>
+
+<div class="game-container" id="game-board"></div>
+
+<div class="info-panel">
+  <h3>Статус стран</h3>
+  <table id="status-table" border="1">
+    <tr><th>Страна</th><th>Золото</th><th>Экономика</th><th>Солдаты</th></tr>
+  </table>
+  <p>Ход: <span id="turn-counter">0</span></p>
+</div>
+
+<div class="controls">
+  <label>
+    Золото на солдат (<span id="gold-available">100</span>): 
+    <input type="number" id="gold-for-soldiers" value="0" min="0">
+  </label>
+  <label>
+    Золото на экономику:
+    <input type="number" id="gold-for-economy" value="0" min="0">
+  </label>
+  <button id="end-turn">Окончить ход</button>
+  <button id="next-turn">Следующий ход</button>
+  <textarea id="save-state" rows="10" cols="50" placeholder="Сохранение игры в JSON"></textarea>
+  <button id="load-game">Загрузить игру</button>
+</div>
+
+<script>
+const initialState = {
+  board: Array(16).fill(null),
+  countries: {
+    blue: { color: 'blue', cells: [0, 1, 4, 5], gold: 100, economy: 1, soldiers: 0 },
+    orange: { color: 'orange', cells: [2, 3, 6, 7], gold: 100, economy: 1, soldiers: 0 },
+    red: { color: 'red', cells: [8, 9, 12, 13], gold: 100, economy: 1, soldiers: 0 },
+    green: { color: 'green', cells: [10, 11, 14, 15], gold: 100, economy: 1, soldiers: 0 }
+  },
+  turn: 0
+};
+
+let state = JSON.parse(JSON.stringify(initialState));
+
+function renderBoard() {
+  const boardElement = document.getElementById('game-board');
+  boardElement.innerHTML = '';
+  state.board.forEach((cell, index) => {
+    const cellDiv = document.createElement('div');
+    cellDiv.className = `cell ${state.countries[cell]?.color || ''}`;
+    cellDiv.textContent = state.countries[cell]?.soldiers || '';
+    boardElement.appendChild(cellDiv);
+  });
+}
+
+function updateStatusTable() {
+  const table = document.getElementById('status-table');
+  table.innerHTML = '<tr><th>Страна</th><th>Золото</th><th>Экономика</th><th>Солдаты</th></tr>';
+  for (const [name, country] of Object.entries(state.countries)) {
+    const row = document.createElement('tr');
+    row.innerHTML = `<td>${name}</td><td>${country.gold}</td><td>${country.economy.toFixed(2)}</td><td>${country.soldiers}</td>`;
+    table.appendChild(row);
+  }
+}
+
+function calculateIncome() {
+  for (const country of Object.values(state.countries)) {
+    const income = (country.cells.length * 5 * country.economy) + (country.gold / 100);
+    country.gold += income;
+  }
+}
+
+function endTurn() {
+  calculateIncome();
+  // Простая логика для ИИ
+  for (const [name, country] of Object.entries(state.countries)) {
+    if (name !== 'orange') {
+      const goldForSoldiers = Math.floor(country.gold * 0.5);
+      const goldForEconomy = country.gold - goldForSoldiers;
+      country.gold -= goldForSoldiers + goldForEconomy;
+      country.soldiers += goldForSoldiers;
+      country.economy += goldForEconomy * 0.01;
+    }
+  }
+  state.turn++;
+  document.getElementById('turn-counter').textContent = state.turn;
+  updateStatusTable();
+  renderBoard();
+}
+
+function nextTurn() {
+  // Логика перемещения войск и боев
+  // Пример: случайное распределение войск
+  for (const country of Object.values(state.countries)) {
+    const totalSoldiers = country.soldiers;
+    const soldiersPerCell = Math.floor(totalSoldiers / country.cells.length);
+    const remainder = totalSoldiers % country.cells.length;
+    country.cells.forEach((cell, idx) => {
+      state.board[cell] = {
+        country: country.color,
+        soldiers: soldiersPerCell + (idx === 0 ? remainder : 0)
+      };
+    });
+  }
+  renderBoard();
+}
+
+function saveGame() {
+  document.getElementById('save-state').value = JSON.stringify(state);
+}
+
+function loadGame() {
+  const savedState = document.getElementById('save-state').value;
+  try {
+    state = JSON.parse(savedState);
+    renderBoard();
+    updateStatusTable();
+    document.getElementById('turn-counter').textContent = state.turn;
+  } catch (e) {
+    alert('Ошибка загрузки сохранения');
+  }
+}
+
+document.getElementById('end-turn').addEventListener('click', () => {
+  const goldForSoldiers = parseInt(document.getElementById('gold-for-soldiers').value) || 0;
+  const goldForEconomy = parseInt(document.getElementById('gold-for-economy').value) || 0;
+  const orange = state.countries.orange;
+  if (goldForSoldiers + goldForEconomy <= orange.gold) {
+    orange.gold -= goldForSoldiers + goldForEconomy;
+    orange.soldiers += goldForSoldiers;
+    orange.economy += goldForEconomy * 0.01;
+    document.getElementById('gold-available').textContent = orange.gold;
+    endTurn();
+  } else {
+    alert('Недостаточно золота');
+  }
+});
+
+document.getElementById('next-turn').addEventListener('click', () => {
+  nextTurn();
+});
+
+document.getElementById('load-game').addEventListener('click', () => {
+  loadGame();
+});
+
+renderBoard();
+updateStatusTable();
+</script>
+
+</body>
+</html>

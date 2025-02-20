@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Стратегия 4x4</title>
+    <style>
+        body {
+            display: flex;
+            gap: 20px;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+
+        #gameContainer {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            gap: 5px;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            border: 2px solid #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .soldiers {
+            font-weight: bold;
+            font-size: 18px;
+            color: white;
+            text-shadow: 1px 1px 2px black;
+        }
+
+        input {
+            width: 80px;
+            padding: 5px;
+        }
+
+        button {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        #infoPanel {
+            margin-top: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+        td, th {
+            border: 1px solid #333;
+            padding: 5px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <div id="gameContainer"></div>
+        <div class="controls">
+            <h3>Управление</h3>
+            <div>
+                <input type="number" id="goldSoldiers" placeholder="Золото на солдат">
+                <input type="number" id="goldEconomy" placeholder="Золото на экономику">
+                <button onclick="endTurn()">Окончить ход</button>
+            </div>
+            <div id="moveControls" style="display: none;">
+                <h4>Перемещение войск</h4>
+                <div id="cellControls"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="infoPanel">
+        <h3>Статус</h3>
+        <table id="statusTable">
+            <tr>
+                <th>Страна</th>
+                <th>Золото</th>
+                <th>Экономика</th>
+                <th>Солдаты</th>
+            </tr>
+        </table>
+        <p>Ход: <span id="turnCounter">0</span></p>
+        <button onclick="saveGame()">Сохранить игру</button>
+        <input type="text" id="saveCode" placeholder="Код сохранения">
+        <button onclick="loadGame()">Загрузить игру</button>
+    </div>
+
+    <script>
+        const CELLS = 16;
+        const COUNTRIES = {
+            ORANGE: {id: 0, color: '#FEA700', cells: [2,3,6,7], gold: 100, economy: 1, soldiers: []},
+            BLUE: {id: 1, color: '#0000F9', cells: [0,1,4,5], gold: 100, economy: 1, soldiers: []},
+            RED: {id: 2, color: '#FA0000', cells: [8,9,12,13], gold: 100, economy: 1, soldiers: []},
+            GREEN: {id: 3, color: '#00B700', cells: [10,11,14,15], gold: 100, economy: 1, soldiers: []}
+        };
+
+        let gameState = {
+            countries: JSON.parse(JSON.stringify(COUNTRIES)),
+            cells: Array(16).fill().map((_,i) => ({
+                owner: Object.values(COUNTRIES).find(c => c.cells.includes(i)).id,
+                soldiers: 25
+            })),
+            turn: 0,
+            playerActions: {soldiers: 0, economy: 0}
+        };
+
+        function initGame() {
+            // Инициализация интерфейса
+            const container = document.getElementById('gameContainer');
+            container.innerHTML = '';
+            
+            gameState.cells.forEach((cell, i) => {
+                const div = document.createElement('div');
+                div.className = 'cell';
+                div.style.backgroundColor = Object.values(gameState.countries).find(c => c.id === cell.owner).color;
+                div.innerHTML = `
+                    <div class="soldiers">${cell.soldiers}</div>
+                    ${cell.owner === 0 ? `
+                        <input type="number" min="0" max="${cell.soldiers}" style="width: 50px;">
+                        <button onclick="moveSoldiers(${i})">→</button>
+                    ` : ''}
+                `;
+                container.appendChild(div);
+            });
+            
+            updateInfo();
+        }
+
+        function updateInfo() {
+            const table = document.getElementById('statusTable');
+            table.innerHTML = `
+                <tr>
+                    <th>Страна</th>
+                    <th>Золото</th>
+                    <th>Экономика</th>
+                    <th>Солдаты</th>
+                </tr>
+                ${Object.values(gameState.countries).map(c => `
+                    <tr>
+                        <td style="background: ${c.color}"></td>
+                        <td>${c.gold.toFixed(1)}</td>
+                        <td>${c.economy.toFixed(2)}</td>
+                        <td>${c.soldiers.reduce((a,b) => a + b, 0)}</td>
+                    </tr>
+                `).join('')}
+            `;
+            document.getElementById('turnCounter').textContent = gameState.turn;
+        }
+
+        function calculateIncome(country) {
+            const cells = gameState.cells.filter(c => c.owner === country.id).length;
+            return cells * 5 * country.economy + country.gold / 100;
+        }
+
+        function processTurn() {
+            // Обработка хода
+            gameState.turn++;
+            
+            // Обновление экономики
+            Object.values(gameState.countries).forEach(c => {
+                c.gold += calculateIncome(c);
+                c.gold += c.gold * 0.01; // Остаток золота
+            });
+            
+            // Обработка ИИ
+            Object.values(gameState.countries).filter(c => c.id !== 0).forEach(c => {
+                const spendSoldiers = Math.random() * c.gold;
+                c.economy += (c.gold - spendSoldiers) * 1.01;
+                c.gold = 0;
+            });
+            
+            initGame();
+        }
+
+        function endTurn() {
+            const soldiersGold = Math.min(document.getElementById('goldSoldiers').value || 0, gameState.countries[0].gold);
+            const economyGold = Math.min(document.getElementById('goldEconomy').value || 0, gameState.countries[0].gold - soldiersGold);
+            
+            gameState.countries[0].gold -= soldiersGold + economyGold;
+            gameState.countries[0].economy += economyGold * 1.01;
+            
+            processTurn();
+        }
+
+        function saveGame() {
+            const saveCode = btoa(JSON.stringify(gameState));
+            document.getElementById('saveCode').value = saveCode;
+            localStorage.setItem('gameSave', saveCode);
+        }
+
+        function loadGame() {
+            const saveCode = document.getElementById('saveCode').value;
+            gameState = JSON.parse(atob(saveCode));
+            initGame();
+        }
+
+        function moveSoldiers(fromCell) {
+            const input = document.querySelectorAll('#gameContainer input')[fromCell];
+            const soldiers = Math.min(parseInt(input.value), gameState.cells[fromCell].soldiers);
+            
+            // Логика перемещения...
+        }
+
+        // Запуск игры
+        initGame();
+    </script>
+</body>
+</html>
