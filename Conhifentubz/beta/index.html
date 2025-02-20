@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Стратегия 4 стран</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- Игровое поле -->
+        <div id="game-board"></div>
+
+        <!-- Панель управления -->
+        <div id="control-panel">
+            <h2>Управление Оранжевой страной</h2>
+            <label for="gold-for-soldiers">Золото на солдат:</label>
+            <input type="number" id="gold-for-soldiers" min="0"><br>
+            <label for="gold-for-economy">Золото на экономику:</label>
+            <input type="number" id="gold-for-economy" min="0"><br>
+            <button id="end-turn">Окончить ход</button>
+        </div>
+
+        <!-- Информационная панель -->
+        <div id="info-panel">
+            <h2>Статус стран</h2>
+            <table id="status-table">
+                <thead>
+                    <tr>
+                        <th>Страна</th>
+                        <th>Золото</th>
+                        <th>Экономика</th>
+                        <th>Солдаты</th>
+                    </tr>
+                </thead>
+                <tbody id="status-body"></tbody>
+            </table>
+            <p><strong>Ход:</strong> <span id="turn-counter">0</span></p>
+            <button id="next-turn">Следующий ход</button>
+        </div>
+
+        <!-- Сохранение игры -->
+        <div id="save-load">
+            <h3>Сохранение игры</h3>
+            <textarea id="save-code" rows="5" cols="50" placeholder="Код сохранения"></textarea><br>
+            <button id="save-game">Сохранить игру</button>
+            <button id="load-game">Загрузить игру</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
