@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Стратегия 4x4</title>
+    <style>
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 80px);
+            gap: 2px;
+            margin: 20px;
+        }
+        
+        .cell {
+            width: 80px;
+            height: 80px;
+            border: 1px solid #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .controls {
+            margin: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        
+        .country-info {
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #999;
+        }
+    </style>
+</head>
+<body>
+    <div id="game">
+        <div class="grid" id="grid"></div>
+        <div class="controls">
+            <select id="countrySelect"></select>
+            <input type="number" id="armyGold" placeholder="Солдаты">
+            <input type="number" id="economyGold" placeholder="Экономика">
+            <button onclick="makeTurn()">Сделать ход</button>
+        </div>
+        <div id="status">Ход: 0/100</div>
+    </div>
+
+    <script>
+        class Country {
+            constructor(id, color) {
+                this.id = id;
+                this.color = color;
+                this.gold = 100;
+                this.soldiers = 0;
+                this.economy = 0;
+                this.cells = [];
+            }
+        }
+
+        const countries = [
+            new Country(0, '#ffcccc'),
+            new Country(1, '#ccffcc'),
+            new Country(2, '#ccccff'),
+            new Country(3, '#ffffcc')
+        ];
+
+        let currentTurn = 0;
+        const gridCells = [];
+
+        function initGame() {
+            // Инициализация сетки 4x4
+            const grid = document.getElementById('grid');
+            for(let i = 0; i < 16; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                const country = countries[Math.floor(i / 4)];
+                country.cells.push(i);
+                cell.style.backgroundColor = country.color;
+                cell.innerHTML = `
+                    <div>${country.id + 1}</div>
+                    <div class="soldiers">0</div>
+                `;
+                grid.appendChild(cell);
+                gridCells.push(cell);
+            }
+
+            // Инициализация выбора страны
+            const select = document.getElementById('countrySelect');
+            countries.forEach((country, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.text = `Страна ${index + 1}`;
+                select.appendChild(option);
+            });
+        }
+
+        function updateGrid() {
+            countries.forEach(country => {
+                country.cells.forEach(cellIndex => {
+                    gridCells[cellIndex].querySelector('.soldiers').textContent = 
+                        Math.floor(country.soldiers / 4);
+                });
+            });
+        }
+
+        function calculateEconomy() {
+            countries.forEach(country => {
+                country.gold += 10 + (country.economy * 5);
+            });
+        }
+
+        function battlePhase() {
+            // Простая система боев между случайными странами
+            countries.forEach(attacker => {
+                const defender = countries.find(c => c !== attacker);
+                if(attacker.soldiers > defender.soldiers) {
+                    defender.soldiers = Math.max(0, defender.soldiers - attacker.soldiers * 0.2);
+                }
+            });
+        }
+
+        function makeTurn() {
+            if(currentTurn >= 100) return;
+            
+            const country = countries[document.getElementById('countrySelect').value];
+            const army = parseInt(document.getElementById('armyGold').value) || 0;
+            const economy = parseInt(document.getElementById('economyGold').value) || 0;
+
+            if(army + economy > country.gold) {
+                alert("Недостаточно золота!");
+                return;
+            }
+
+            country.soldiers += army;
+            country.economy += economy;
+            country.gold -= army + economy;
+
+            calculateEconomy();
+            battlePhase();
+            updateGrid();
+            
+            currentTurn++;
+            document.getElementById('status').textContent = `Ход: ${currentTurn}/100`;
+            
+            if(currentTurn === 100) {
+                const winner = countries.reduce((a, b) => a.soldiers > b.soldiers ? a : b);
+                alert(`Игра окончена! Победитель: Страна ${winner.id + 1}`);
+            }
+        }
+
+        // Запуск игры
+        initGame();
+    </script>
+</body>
+</html>
