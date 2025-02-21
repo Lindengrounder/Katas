@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Пошаговая стратегия</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    /* Стили для игрового поля */
+    #game-board {
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      grid-template-rows: repeat(4, 100px);
+      gap: 5px;
+      margin-bottom: 20px;
+    }
+    .cell {
+      border: 1px solid #ccc;
+      position: relative;
+      padding: 5px;
+      box-sizing: border-box;
+    }
+    .cell .info {
+      font-size: 12px;
+    }
+    /* Кнопка перемещения и поле ввода в ячейке */
+    .move-controls {
+      position: absolute;
+      bottom: 5px;
+      left: 5px;
+      right: 5px;
+    }
+    .move-controls input {
+      width: 40px;
+      font-size: 10px;
+    }
+    .move-controls button {
+      font-size: 10px;
+      margin-left: 2px;
+    }
+    /* Цвета стран */
+    .blue { background-color: #0000F9; color: #fff; }
+    .orange { background-color: #FEA700; color: #000; }
+    .red { background-color: #FA0000; color: #fff; }
+    .green { background-color: #00B700; color: #fff; }
+    /* Панель управления */
+    #control-panel, #info-panel, #save-panel {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+    table, th, td {
+      border: 1px solid #ccc;
+      border-collapse: collapse;
+      padding: 5px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Пошаговая стратегия</h1>
+  
+  <!-- Игровое поле -->
+  <div id="game-board"></div>
+  
+  <!-- Панель управления действиями игрока -->
+  <div id="control-panel">
+    <h2>Панель управления</h2>
+    <div>
+      <label for="soldierGold">Золото на солдат:</label>
+      <input type="number" id="soldierGold" placeholder="0">
+    </div>
+    <div>
+      <label for="econGold">Золото на экономику:</label>
+      <input type="number" id="econGold" placeholder="0">
+    </div>
+    <button id="endTurnBtn">Окончить ход</button>
+  </div>
+  
+  <!-- Информационная панель -->
+  <div id="info-panel">
+    <h2>Статус стран</h2>
+    <table id="statusTable">
+      <thead>
+        <tr>
+          <th>Страна</th>
+          <th>Золото</th>
+          <th>Экономика</th>
+          <th>Солдаты</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <p>Ход: <span id="turnCounter">1</span></p>
+    <button id="nextTurnBtn">Следующий ход</button>
+  </div>
+  
+  <!-- Панель сохранения/загрузки игры -->
+  <div id="save-panel">
+    <h2>Сохранение/Загрузка</h2>
+    <button id="saveBtn">Сохранить игру</button>
+    <br><br>
+    <textarea id="saveData" rows="5" cols="50" placeholder="JSON сохранения"></textarea>
+    <br>
+    <button id="loadBtn">Загрузить игру</button>
+  </div>
+  
+  <script>
+    // Глобальное состояние игры
+    const gameState = {
+      turn: 1,
+      board: [], // массив 16 клеток
+      countries: {
+        blue: { name: "Синяя", gold: 100, econ: 1, soldiers: 40, cells: [0,1,4,5] },
+        orange: { name: "Оранжевая", gold: 100, econ: 1, soldiers: 40, cells: [2,3,6,7] },
+        red: { name: "Красная", gold: 100, econ: 1, soldiers: 40, cells: [8,9,12,13] },
+        green: { name: "Зеленая", gold: 100, econ: 1, soldiers: 40, cells: [10,11,14,15] }
+      }
+    };
+    
+    // Инициализация игрового поля
+    function initBoard() {
+      const boardContainer = document.getElementById('game-board');
+      boardContainer.innerHTML = '';
+      gameState.board = [];
+      for (let i = 0; i < 16; i++) {
+        // Определяем владельца клетки по индексам
+        let owner = null;
+        let cssClass = '';
+        if ([0,1,4,5].includes(i)) { owner = 'blue'; cssClass = 'blue'; }
+        else if ([2,3,6,7].includes(i)) { owner = 'orange'; cssClass = 'orange'; }
+        else if ([8,9,12,13].includes(i)) { owner = 'red'; cssClass = 'red'; }
+        else if ([10,11,14,15].includes(i)) { owner = 'green'; cssClass = 'green'; }
+        const cell = {
+          id: i,
+          owner: owner,
+          soldiers: 0
+        };
+        gameState.board.push(cell);
+        
+        const cellDiv = document.createElement('div');
+        cellDiv.className = `cell ${cssClass}`;
+        cellDiv.id = `cell-${i}`;
+        cellDiv.innerHTML = `<div class="info">Владелец: ${owner ? gameState.countries[owner].name : 'Нет'}</div>
+                             <div class="info">Солдаты: 0</div>`;
+        // Если клетка принадлежит игроку (оранжевая) – добавляем интерфейс перемещения
+        if (owner === 'orange') {
+          const moveDiv = document.createElement('div');
+          moveDiv.className = 'move-controls';
+          moveDiv.innerHTML = `<input type="number" placeholder="Кол-во" id="move-${i}">
+                               <button onclick="moveTroops(${i})">Переместить</button>`;
+          cellDiv.appendChild(moveDiv);
+        }
+        boardContainer.appendChild(cellDiv);
+      }
+      // Распределяем солдат по клеткам стран равномерно (остаток в столице – угловой клетке)
+      distributeSoldiers();
+    }
+    
+    // Функция распределения солдат внутри страны
+    function distributeSoldiers() {
+      for (let key in gameState.countries) {
+        const country = gameState.countries[key];
+        const numCells = country.cells.length;
+        const base = Math.floor(country.soldiers / numCells);
+        const remainder = country.soldiers % numCells;
+        country.cells.forEach((cellId, index) => {
+          let soldiersInCell = base;
+          // Предположим, что столицей является первая клетка в списке
+          if (index === 0) {
+            soldiersInCell += remainder;
+          }
+          // Обновляем данные клетки
+          const cell = gameState.board[cellId];
+          cell.soldiers = soldiersInCell;
+          updateCellUI(cellId);
+        });
+      }
+    }
+    
+    // Обновление UI конкретной клетки
+    function updateCellUI(cellId) {
+      const cell = gameState.board[cellId];
+      const cellDiv = document.getElementById(`cell-${cellId}`);
+      if (cellDiv) {
+        cellDiv.querySelector('.info').innerHTML = `Владелец: ${gameState.countries[cell.owner].name}`;
+        cellDiv.querySelectorAll('.info')[1].innerHTML = `Солдаты: ${cell.soldiers}`;
+      }
+    }
+    
+    // Функция перемещения войск внутри страны (простейшая заглушка)
+    function moveTroops(fromCellId) {
+      // Для простоты проверяем, что ввод корректен и выполняем перемещение на соседнюю клетку
+      const input = document.getElementById(`move-${fromCellId}`);
+      const count = parseInt(input.value) || 0;
+      // Определяем соседей (здесь можно реализовать более сложную логику)
+      const neighbors = getNeighborCells(fromCellId);
+      if (neighbors.length === 0) return;
+      // Для примера переместим войска в первую соседнюю клетку, принадлежащую тому же игроку
+      let targetCellId = null;
+      for (let nb of neighbors) {
+        if (gameState.board[nb].owner === gameState.board[fromCellId].owner) {
+          targetCellId = nb;
+          break;
+        }
+      }
+      if (targetCellId === null) {
+        alert("Нет подходящей соседней клетки для перемещения!");
+        return;
+      }
+      // Перемещение: вычесть из одной и добавить в другую
+      if (gameState.board[fromCellId].soldiers < count) {
+        alert("Недостаточно солдат для перемещения!");
+        return;
+      }
+      gameState.board[fromCellId].soldiers -= count;
+      gameState.board[targetCellId].soldiers += count;
+      updateCellUI(fromCellId);
+      updateCellUI(targetCellId);
+      input.value = '';
+    }
+    
+    // Простейшая функция для получения соседних клеток по индексу
+    function getNeighborCells(index) {
+      const neighbors = [];
+      const row = Math.floor(index / 4);
+      const col = index % 4;
+      // Верхняя клетка
+      if (row > 0) neighbors.push(index - 4);
+      // Нижняя клетка
+      if (row < 3) neighbors.push(index + 4);
+      // Левая клетка
+      if (col > 0) neighbors.push(index - 1);
+      // Правая клетка
+      if (col < 3) neighbors.push(index + 1);
+      return neighbors;
+    }
+    
+    // Обновление информационной панели
+    function updateInfoPanel() {
+      const tbody = document.querySelector("#statusTable tbody");
+      tbody.innerHTML = "";
+      for (let key in gameState.countries) {
+        const country = gameState.countries[key];
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${country.name}</td>
+                        <td>${country.gold}</td>
+                        <td>${country.econ.toFixed(2)}</td>
+                        <td>${country.soldiers}</td>`;
+        tbody.appendChild(tr);
+      }
+      document.getElementById("turnCounter").innerText = gameState.turn;
+    }
+    
+    // Обработка хода игрока и ИИ
+    function processTurn() {
+      // 1. Начисление дохода
+      for (let key in gameState.countries) {
+        const country = gameState.countries[key];
+        // Количество клеток, принадлежащих стране
+        const cellCount = country.cells.length;
+        // Формула дохода (остаток золота прошлых ходов не учитывается отдельно для простоты)
+        const income = (cellCount * 5 * country.econ) + (country.gold / 100);
+        country.gold = Math.floor(country.gold + income);
+      }
+      
+      // 2. Игрок выбирает распределение золота
+      const soldierGold = parseInt(document.getElementById('soldierGold').value) || 0;
+      const econGold = parseInt(document.getElementById('econGold').value) || 0;
+      const totalAllocation = soldierGold + econGold;
+      const player = gameState.countries.orange;
+      if (totalAllocation > player.gold) {
+        // Если выделено больше золота, чем имеется, инвестируем всё в экономику
+        player.econ *= Math.pow(1.01, player.gold);
+        player.gold = 0;
+      } else {
+        // Нанимаем солдат – допустим, 1 золото = 1 солдат
+        player.soldiers += soldierGold;
+        // Инвестиции в экономику
+        player.econ *= Math.pow(1.01, econGold);
+        player.gold -= totalAllocation;
+      }
+      
+      // 3. Действия ИИ (случайное распределение ресурсов)
+      for (let key in gameState.countries) {
+        if (key === 'orange') continue;
+        const comp = gameState.countries[key];
+        // Случайно распределяем 0 - comp.gold золота
+        const alloc = Math.floor(Math.random() * (comp.gold + 1));
+        // Случайное деление между солдатами и экономикой
+        const allocSoldiers = Math.floor(alloc * Math.random());
+        const allocEcon = alloc - allocSoldiers;
+        comp.soldiers += allocSoldiers;
+        comp.econ *= Math.pow(1.01, allocEcon);
+        comp.gold -= alloc;
+      }
+      
+      // 4. Расчёт боёв, перемещений, захватов клеток и распределения солдат
+      // Здесь необходимо реализовать логику боя между соседями и захват клеток по правилам ТЗ.
+      // В данном примере опустим подробную симуляцию боя.
+      
+      // 5. Перераспределение солдат по клеткам
+      distributeSoldiers();
+      
+      // 6. Обновление информационной панели
+      updateInfoPanel();
+      
+      // Переход к следующему ходу
+      gameState.turn++;
+    }
+    
+    // Сохранение игры в JSON и запись в textarea, а также в localStorage
+    function saveGame() {
+      const saveStr = JSON.stringify(gameState);
+      document.getElementById('saveData').value = saveStr;
+      localStorage.setItem("strategyGameSave", saveStr);
+      alert("Игра сохранена!");
+    }
+    
+    // Загрузка игры из JSON
+    function loadGame() {
+      let loadStr = document.getElementById('saveData').value;
+      if (!loadStr) {
+        // Если поле пустое, попробуем загрузить из localStorage
+        loadStr = localStorage.getItem("strategyGameSave");
+      }
+      if (loadStr) {
+        const loadedState = JSON.parse(loadStr);
+        // Обновляем глобальное состояние (здесь следует добавить проверки)
+        Object.assign(gameState, loadedState);
+        // Перерисовываем игровое поле и обновляем информационную панель
+        initBoard();
+        updateInfoPanel();
+        alert("Игра загружена!");
+      } else {
+        alert("Нет сохранённых данных!");
+      }
+    }
+    
+    // Инициализация страницы
+    document.getElementById('endTurnBtn').addEventListener('click', processTurn);
+    document.getElementById('nextTurnBtn').addEventListener('click', processTurn);
+    document.getElementById('saveBtn').addEventListener('click', saveGame);
+    document.getElementById('loadBtn').addEventListener('click', loadGame);
+    
+    // Первоначальная инициализация
+    initBoard();
+    updateInfoPanel();
+  </script>
+</body>
+</html>

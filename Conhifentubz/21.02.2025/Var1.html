@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пошаговая стратегия</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .game-container { display: flex; }
+        .game-board { display: grid; grid-template-columns: repeat(4, 100px); grid-gap: 2px; }
+        .cell { width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; text-align: center; border: 1px solid black; }
+        .orange { background-color: #FEA700; }
+        .blue { background-color: #0000F9; color: white; }
+        .red { background-color: #FA0000; color: white; }
+        .green { background-color: #00B700; color: white; }
+    </style>
+</head>
+<body>
+    <h1>Пошаговая стратегия</h1>
+    <div class="game-container">
+        <div class="game-board" id="gameBoard"></div>
+        <div class="control-panel">
+            <h2>Управление</h2>
+            <label>Золото на солдат: <input type="number" id="goldToSoldiers" min="0"></label>
+            <label>Золото на экономику: <input type="number" id="goldToEconomy" min="0"></label>
+            <button onclick="endTurn()">Окончить ход</button>
+            <h2>Статистика</h2>
+            <div id="stats"></div>
+            <h3>Сохранение</h3>
+            <button onclick="saveGame()">Сохранить</button>
+            <button onclick="loadGame()">Загрузить</button>
+        </div>
+    </div>
+    <script>
+        const initialState = {
+            turn: 1,
+            countries: {
+                orange: { gold: 100, economy: 1, soldiers: 0, cells: [2, 3, 6, 7] },
+                blue: { gold: 100, economy: 1, soldiers: 0, cells: [0, 1, 4, 5] },
+                red: { gold: 100, economy: 1, soldiers: 0, cells: [8, 9, 12, 13] },
+                green: { gold: 100, economy: 1, soldiers: 0, cells: [10, 11, 14, 15] }
+            }
+        };
+        let gameState = JSON.parse(JSON.stringify(initialState));
+        
+        function renderBoard() {
+            const board = document.getElementById('gameBoard');
+            board.innerHTML = '';
+            for (let i = 0; i < 16; i++) {
+                let cell = document.createElement('div');
+                cell.className = 'cell';
+                for (const [key, country] of Object.entries(gameState.countries)) {
+                    if (country.cells.includes(i)) {
+                        cell.classList.add(key);
+                        cell.textContent = `${key}\n${country.soldiers}`;
+                    }
+                }
+                board.appendChild(cell);
+            }
+        }
+        
+        function updateStats() {
+            const stats = document.getElementById('stats');
+            stats.innerHTML = Object.entries(gameState.countries).map(([key, country]) => `
+                <p>${key.toUpperCase()} - Золото: ${country.gold}, Экономика: ${country.economy.toFixed(2)}, Солдаты: ${country.soldiers}</p>
+            `).join('');
+        }
+        
+        function endTurn() {
+            let goldToSoldiers = parseInt(document.getElementById('goldToSoldiers').value) || 0;
+            let goldToEconomy = parseInt(document.getElementById('goldToEconomy').value) || 0;
+            let orange = gameState.countries.orange;
+            if (goldToSoldiers + goldToEconomy > orange.gold) {
+                goldToSoldiers = orange.gold;
+                goldToEconomy = 0;
+            }
+            orange.gold -= (goldToSoldiers + goldToEconomy);
+            orange.soldiers += goldToSoldiers;
+            orange.economy += goldToEconomy * 0.01;
+            for (const key of Object.keys(gameState.countries)) {
+                if (key !== 'orange') {
+                    let aiGold = gameState.countries[key].gold;
+                    let aiInvest = Math.floor(aiGold * Math.random());
+                    gameState.countries[key].gold -= aiInvest;
+                    gameState.countries[key].economy += aiInvest * 0.01;
+                    gameState.countries[key].soldiers += (aiGold - aiInvest);
+                }
+                gameState.countries[key].gold += Math.floor(gameState.countries[key].cells.length * 5 * gameState.countries[key].economy);
+            }
+            gameState.turn++;
+            renderBoard();
+            updateStats();
+        }
+        
+        function saveGame() {
+            localStorage.setItem('gameState', JSON.stringify(gameState));
+        }
+        
+        function loadGame() {
+            let saved = localStorage.getItem('gameState');
+            if (saved) {
+                gameState = JSON.parse(saved);
+                renderBoard();
+                updateStats();
+            }
+        }
+        
+        renderBoard();
+        updateStats();
+    </script>
+</body>
+</html>
