@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Стратегия 4x</title>
+    <style>
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(36, 20px);
+            grid-template-rows: repeat(18, 20px);
+            gap: 1px;
+            margin: 10px;
+        }
+        .cell {
+            width: 20px;
+            height: 20px;
+            border: 1px solid #ccc;
+            position: relative;
+        }
+        .capital {
+            border: 2px solid black;
+        }
+        .unit {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+        }
+        .selected {
+            outline: 2px solid white;
+        }
+        #info {
+            padding: 10px;
+            font-family: Arial;
+        }
+        button {
+            margin: 5px;
+            padding: 5px 10px;
+        }
+        #unit-controls {
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            display: none; /* Скрываем панель управления по умолчанию */
+        }
+    </style>
+</head>
+<body>
+    <!-- Основная информация -->
+    <div id="info">
+        Ход игрока: <span id="current-player">1</span> | 
+        Золото: <span id="gold">10</span>
+        <button onclick="buyUnit()">Купить юнита (100💰)</button>
+        <button onclick="endTurn()">Следующий ход</button>
+    </div>
+
+    <!-- Панель управления юнитом -->
+    <div id="unit-controls">
+        <p>Управление юнитом:</p>
+        <button onclick="moveUp()">↑</button><br>
+        <button onclick="moveLeft()">←</button>
+        <button onclick="moveRight()">→</button><br>
+        <button onclick="moveDown()">↓</button>
+    </div>
+
+    <!-- Поле игры -->
+    <div id="game-board"></div>
+
+    <script>
+        let currentPlayerIndex = 0;
+        let selectedUnit = null;
+        const players = [
+            { id: 1, color: '#ff0000', gold: 10, cells: [], units: [], capital: null },
+            { id: 2, color: '#0000ff', gold: 10, cells: [], units: [], capital: null },
+            { id: 3, color: '#00ff00', gold: 10, cells: [], units: [], capital: null },
+            { id: 4, color: '#ffff00', gold: 10, cells: [], units: [], capital: null },
+        ];
+
+        const grid = Array(18).fill().map(() => 
+            Array(36).fill().map(() => ({
+                owner: null,
+                isCapital: false,
+                unit: null
+            }))
+        );
+
+        // Инициализация игроков
+        players.forEach((player, index) => {
+            let x, y;
+            switch(index) {
+                case 0: y = 0; x = 0; break;
+                case 1: y = 0; x = 35; break;
+                case 2: y = 17; x = 0; break;
+                case 3: y = 17; x = 35; break;
+            }
+
+            grid[y][x] = {
+                owner: player.id,
+                isCapital: true,
+                unit: { owner: player.id, x, y }
+            };
+
+            player.capital = { x, y };
+            player.cells.push({ x, y });
+            player.units.push(grid[y][x].unit);
+        });
+
+        function renderBoard() {
+            const board = document.getElementById('game-board');
+            board.innerHTML = '';
+
+            for(let y = 0; y < 18; y++) {
+                for(let x = 0; x < 36; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    const cellData = grid[y][x];
+
+                    if(cellData.owner) {
+                        cell.style.backgroundColor = players.find(p => p.id === cellData.owner).color + '80';
+                    }
+
+                    if(cellData.isCapital) cell.classList.add('capital');
+
+                    if(cellData.unit) {
+                        const unit = document.createElement('div');
+                        unit.className = 'unit';
+                        unit.style.backgroundColor = players.find(p => p.id === cellData.unit.owner).color;
+                        if(selectedUnit === cellData.unit) unit.classList.add('selected');
+                        cell.appendChild(unit);
+                    }
+
+                    cell.dataset.x = x;
+                    cell.dataset.y = y;
+                    cell.addEventListener('click', handleCellClick);
+                    board.appendChild(cell);
+                }
+            }
+        }
+
+        function handleCellClick(e) {
+            const x = parseInt(e.target.dataset.x);
+            const y = parseInt(e.target.dataset.y);
+            const cellData = grid[y][x];
+            const currentPlayer = players[currentPlayerIndex];
+
+            if(cellData.unit?.owner === currentPlayer.id) {
+                selectedUnit = cellData.unit;
+                document.getElementById('unit-controls').style.display = 'block'; // Показываем панель управления
+            } else {
+                selectedUnit = null;
+                document.getElementById('unit-controls').style.display = 'none'; // Скрываем панель управления
+            }
+            renderBoard();
+        }
+
+        function moveUnitTo(newX, newY) {
+            if (!selectedUnit) return;
+            if (!isAdjacent(selectedUnit.x, selectedUnit.y, newX, newY)) return;
+
+            const cellData = grid[newY][newX];
+            const currentPlayer = players[currentPlayerIndex];
+
+            if (cellData.unit) {
+                if (cellData.unit.owner === currentPlayer.id) {
+                    alert('Здесь уже есть ваш юнит!');
+                    return;
+                }
+                battle(currentPlayer, cellData.unit.owner, newX, newY);
+            } else {
+                moveUnit(selectedUnit, newX, newY);
+                captureCell(newX, newY, currentPlayer);
+            }
+            renderBoard();
+        }
+
+        function moveUp() {
+            if (!selectedUnit) return;
+            const newY = selectedUnit.y - 1;
+            if (newY >= 0) moveUnitTo(selectedUnit.x, newY);
+        }
+
+        function moveDown() {
+            if (!selectedUnit) return;
+            const newY = selectedUnit.y + 1;
+            if (newY < 18) moveUnitTo(selectedUnit.x, newY);
+        }
+
+        function moveLeft() {
+            if (!selectedUnit) return;
+            const newX = selectedUnit.x - 1;
+            if (newX >= 0) moveUnitTo(newX, selectedUnit.y);
+        }
+
+        function moveRight() {
+            if (!selectedUnit) return;
+            const newX = selectedUnit.x + 1;
+            if (newX < 36) moveUnitTo(newX, selectedUnit.y);
+        }
+
+        function isAdjacent(x1, y1, x2, y2) {
+            const dx = Math.abs(x1 - x2);
+            const dy = Math.abs(y1 - y2);
+            return (dx === 1 && dy === 0) || (dx === 0 && dy === 1);
+        }
+
+        function moveUnit(unit, newX, newY) {
+            grid[unit.y][unit.x].unit = null;
+            unit.x = newX;
+            unit.y = newY;
+            grid[newY][newX].unit = unit;
+        }
+
+        function captureCell(x, y, player) {
+            if(grid[y][x].owner !== player.id) {
+                grid[y][x].owner = player.id;
+                player.cells.push({ x, y });
+            }
+        }
+
+        function battle(attacker, defenderId, x, y) {
+            const defender = players.find(p => p.id === defenderId);
+            const defenderUnit = grid[y][x].unit;
+
+            defender.units = defender.units.filter(u => u !== defenderUnit);
+            moveUnit(selectedUnit, x, y);
+            captureCell(x, y, attacker);
+        }
+
+        function endTurn() {
+            const currentPlayer = players[currentPlayerIndex];
+            currentPlayer.gold += currentPlayer.cells.length * 5;
+
+            currentPlayerIndex = (currentPlayerIndex + 1) % 4;
+            selectedUnit = null;
+            document.getElementById('unit-controls').style.display = 'none';
+            updateInfo();
+            checkWin();
+        }
+
+        function buyUnit() {
+            const currentPlayer = players[currentPlayerIndex];
+            if(currentPlayer.gold >= 100) {
+                const capital = currentPlayer.capital;
+                if(!grid[capital.y][capital.x].unit) {
+                    currentPlayer.gold -= 100;
+                    const unit = { owner: currentPlayer.id, x: capital.x, y: capital.y };
+                    grid[capital.y][capital.x].unit = unit;
+                    currentPlayer.units.push(unit);
+                    renderBoard();
+                    updateInfo();
+                } else {
+                    alert('В столице уже есть юнит!');
+                }
+            } else {
+                alert('Недостаточно золота!');
+            }
+        }
+
+        function checkWin() {
+            const currentPlayer = players[currentPlayerIndex];
+            const allCapitals = players.map(p => p.capital);
+            const controlled = allCapitals.every(c => grid[c.y][c.x].owner === currentPlayer.id);
+
+            if(controlled) {
+                alert(`Игрок ${currentPlayer.id} победил!`);
+                location.reload();
+            }
+        }
+
+        function updateInfo() {
+            const cp = players[currentPlayerIndex];
+            document.getElementById('current-player').textContent = cp.id;
+            document.getElementById('gold').textContent = cp.gold;
+        }
+
+        // Начало игры
+        renderBoard();
+        updateInfo();
+    </script>
+</body>
+</html>
