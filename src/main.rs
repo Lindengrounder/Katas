@@ -6,10 +6,6 @@ const WIDTH: usize = 10;
 enum Cell {
     Empty,
     Filled,
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
 }
 
 type Shape = [[Cell; 4]; 4];
