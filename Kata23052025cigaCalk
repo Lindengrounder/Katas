@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Цыганское Бароко Калькулятор</title>
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #2c053d, #6a1b9a);
+      color: #fff;
+      font-family: 'Cursive', 'Brush Script MT', cursive;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .calculator {
+      background: radial-gradient(circle at top left, #a74eaa, #3f003f);
+      border: 5px double gold;
+      border-radius: 20px;
+      box-shadow: 0 0 20px gold;
+      padding: 20px;
+      width: 400px;
+    }
+
+    h2 {
+      text-align: center;
+      color: gold;
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+
+    .input-group {
+      margin-bottom: 10px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid gold;
+      border-radius: 10px;
+      background: #1a001a;
+      color: gold;
+      font-size: 1.1em;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 2px solid gold;
+      border-radius: 10px;
+      background: #2e002e;
+      color: gold;
+      font-size: 1em;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    button {
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      background: gold;
+      color: #3f003f;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    .result {
+      margin-top: 20px;
+      background: #4b004b;
+      padding: 15px;
+      border-radius: 10px;
+      white-space: pre-wrap;
+      font-size: 1em;
+      color: gold;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <h2>🔮 Цыганский Калькулятор</h2>
+    <div class="input-group">
+      <label for="valueA">Введите число A:</label>
+      <input type="number" id="valueA" />
+    </div>
+    <div class="input-group">
+      <label for="valueB">Введите число B:</label>
+      <input type="number" id="valueB" />
+    </div>
+    <div class="input-group">
+      <label for="unit">Выберите единицу измерения площади:</label>
+      <select id="unit">
+        <option value="hectare">Гектары</option>
+        <option value="are">Сотки</option>
+        <option value="squareMeter">Квадратные метры</option>
+      </select>
+    </div>
+    <div class="buttons">
+      <button onclick="calculate('+')">+</button>
+      <button onclick="calculate('-')">−</button>
+      <button onclick="calculate('*')">×</button>
+      <button onclick="calculate('/')">÷</button>
+      <button onclick="calculate('%')">Mod</button>
+      <button onclick="binaryOps()">Бинарные операции</button>
+    </div>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    function calculate(op) {
+      const a = parseInt(document.getElementById("valueA").value);
+      const b = parseInt(document.getElementById("valueB").value);
+      const unit = document.getElementById("unit").value;
+      let resultText = "";
+
+      if (isNaN(a) || isNaN(b)) {
+        alert("Пожалуйста, введите оба числа.");
+        return;
+      }
+
+      switch (op) {
+        case "+":
+          resultText += `Результат сложения: ${a + b}\n`;
+          break;
+        case "-":
+          resultText += `Результат вычитания: ${a - b}\n`;
+          break;
+        case "*":
+          resultText += `Результат умножения: ${a * b}\n`;
+          break;
+        case "/":
+          resultText += `Результат деления: ${Math.floor(a / b)}\n`;
+          resultText += `Остаток от деления: ${a % b}\n`;
+          break;
+        case "%":
+          resultText += `Модуль: ${a % b}\n`;
+          break;
+      }
+
+      // Конвертация площадей
+      let hectare = 0, are = 0, squareMeter = 0;
+
+      switch (unit) {
+        case "hectare":
+          hectare = a;
+          are = a * 100;
+          squareMeter = a * 10000;
+          break;
+        case "are":
+          hectare = a / 100;
+          are = a;
+          squareMeter = a * 100;
+          break;
+        case "squareMeter":
+          hectare = a / 10000;
+          are = a / 100;
+          squareMeter = a;
+          break;
+      }
+
+      resultText += `\nПеревод площади:\n`;
+      resultText += `Гектары: ${hectare.toFixed(2)}\n`;
+      resultText += `Сотки: ${are.toFixed(2)}\n`;
+      resultText += `Квадратные метры: ${squareMeter.toFixed(2)}\n`;
+
+      document.getElementById("result").textContent = resultText;
+    }
+
+    function binaryOps() {
+      const a = parseInt(document.getElementById("valueA").value);
+      const b = parseInt(document.getElementById("valueB").value);
+
+      if (isNaN(a) || isNaN(b)) {
+        alert("Пожалуйста, введите оба числа для бинарных операций.");
+        return;
+      }
+
+      const andOp = a & b;
+      const orOp = a | b;
+      const xorOp = a ^ b;
+      const notA = ~a;
+      const shiftLeft = a << 1;
+      const shiftRight = a >> 1;
+
+      const resultText = `
+Бинарные операции:
+${a} & ${b} = ${andOp} (AND)
+${a} | ${b} = ${orOp} (OR)
+${a} ^ ${b} = ${xorOp} (XOR)
+~${a} = ${notA} (NOT)
+${a} << 1 = ${shiftLeft} (Shift Left)
+${a} >> 1 = ${shiftRight} (Shift Right)
+      `;
+
+      document.getElementById("result").textContent = resultText;
+    }
+  </script>
+</body>
+</html>
