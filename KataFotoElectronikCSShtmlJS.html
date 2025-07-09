@@ -11,20 +11,17 @@
             --busbars-color: #d1d5db;
             --backsheet-color: #e5e7eb;
         }
-
         body {
             font-family: 'Segoe UI', sans-serif;
             margin: 0;
             padding: 0;
             background: linear-gradient(to bottom, #f0f9ff, #ffffff);
         }
-
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 2rem;
         }
-
         header {
             background: #1d4ed8;
             color: white;
@@ -32,37 +29,28 @@
             margin-bottom: 2rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-
-        .panel-model {
+        .panel-model-container {
             position: relative;
             width: 100%;
             max-width: 600px;
-            height: 400px;
             margin: 0 auto 3rem;
+        }
+        .panel-model {
             background: #bfdbfe;
             border: 2px solid #e2e8f0;
             border-radius: 1rem;
             overflow: hidden;
+            position: relative;
+            height: 400px;
         }
-
         .panel-component {
             position: absolute;
             cursor: pointer;
             transition: transform 0.2s;
-            position: absolute;
-            cursor: pointer;
-            transition: transform 0.2s;
-            z-index: 1; /* Базовый уровень */
         }
-
         .panel-component:hover {
             transform: scale(1.05);
-            position: absolute;
-            cursor: pointer;
-            transition: transform 0.2s;
-            z-index: 1; /* Базовый уровень */
         }
-
         .glass {
             z-index: 5; 
             top: 0;
@@ -71,7 +59,6 @@
             height: 10%;
             background: linear-gradient(to bottom, #dbeafe, #bfdbfe);
         }
-
         .eva {
             z-index: 4;
             top: 10%;
@@ -80,7 +67,6 @@
             height: 10%;
             background: #fef9c3;
         }
-
         .cells {
             z-index: 3;
             top: 20%;
@@ -93,12 +79,10 @@
             gap: 2px;
             padding: 1rem;
         }
-
         .cell {
             background: #facc15;
             border-radius: 2px;
         }
-
         .busbars {
             z-index: 2;
             top: 60%;
@@ -107,7 +91,6 @@
             height: 2%;
             background: #d1d5db;
         }
-
         .backsheet {
             z-index: 1;
             top: 80%;
@@ -116,10 +99,9 @@
             height: 10%;
             background: #e5e7eb;
         }
-        
         .tooltip {
             position: absolute;
-            top: -120px;
+            top: -40px;
             left: 50%;
             transform: translateX(-50%);
             background: white;
@@ -132,11 +114,9 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s, transform 0.3s;
-            z-index: 1000; /* Основное исправление */
-            will-change: transform, opacity; /* Для лучшей производительности */
+            z-index: 1000;
+            will-change: transform, opacity;
         }
-
-
         .tooltip::after {
             content: "";
             position: absolute;
@@ -147,21 +127,13 @@
             border-style: solid;
             border-color: white transparent transparent transparent;
         }
-
         .panel-component:hover .tooltip {
             opacity: 1;
             transform: translate(-50%, -10px);
-            position: absolute;
-            cursor: pointer;
-            transition: transform 0.2s;
-            z-index: 1; /* Базовый уровень */
         }
-
-
         .section {
             margin-bottom: 3rem;
         }
-
         .card {
             background: white;
             border-radius: 1rem;
@@ -169,23 +141,19 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             margin-bottom: 2rem;
         }
-
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 1rem;
         }
-
         th, td {
             padding: 0.75rem;
             text-align: left;
             border-bottom: 1px solid #e5e7eb;
         }
-
         thead {
             background-color: #bfdbfe;
         }
-
         footer {
             background: #1d4ed8;
             color: white;
@@ -202,57 +170,52 @@
             <p class="mt-2 text-blue-100">Интерактивный научный справочник</p>
         </div>
     </header>
-
     <main class="container">
         <!-- Интерактивная модель -->
         <section class="section">
-            <div class="panel-model">
-                <!-- Стекло -->
-                <div class="panel-component glass" style="z-index: 5;">
-                    <div class="tooltip">
-                        Прозрачный защитный слой из закаленного стекла толщиной 3-4 мм. Обладает высокой механической прочностью и пропускает более 90% солнечного света. Поверхность часто покрыта антибликовым напылением для увеличения эффективности.
+            <div class="panel-model-container">
+                <div class="panel-model">
+                    <!-- Стекло -->
+                    <div class="panel-component glass" style="z-index: 5;">
+                        <div class="tooltip">
+                            Прозрачный защитный слой из закаленного стекла толщиной 3-4 мм. Обладает высокой механической прочностью и пропускает более 90% солнечного света. Поверхность часто покрыта антибликовым напылением для увеличения эффективности.
+                        </div>
                     </div>
-                </div>
-
-                <!-- EVA-пленка -->
-                <div class="panel-component eva" style="z-index: 4;">
-                    <div class="tooltip">
-                        Этиленвинилацетатная пленка (EVA) служит герметизирующим слоем. Она обладает высокой светопроницаемостью, устойчива к УФ-излучению и обеспечивает механическое соединение между стеклом и солнечными элементами.
+                    <!-- EVA-пленка -->
+                    <div class="panel-component eva" style="z-index: 4;">
+                        <div class="tooltip">
+                            Этиленвинилацетатная пленка (EVA) служит герметизирующим слоем. Она обладает высокой светопроницаемостью, устойчива к УФ-излучению и обеспечивает механическое соединение между стеклом и солнечными элементами.
+                        </div>
                     </div>
-                </div>
-
-                <!-- Фотоэлементы -->
-                <div class="panel-component cells" style="z-index: 3;">
-                    <div class="tooltip">
-                        Кремниевые полупроводниковые элементы, преобразующие солнечную энергию в электричество. Состоят из p-n перехода, где фотоны возбуждают электроны, создавая электрический ток. Эффективность монокристаллических элементов достигает 22-27%.
+                    <!-- Фотоэлементы -->
+                    <div class="panel-component cells" style="z-index: 3;">
+                        <div class="tooltip">
+                            Кремниевые полупроводниковые элементы, преобразующие солнечную энергию в электричество. Состоят из p-n перехода, где фотоны возбуждают электроны, создавая электрический ток. Эффективность монокристаллических элементов достигает 22-27%.
+                        </div>
+                        <div class="grid grid-cols-6 gap-1 p-4">
+                            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+                            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+                        </div>
                     </div>
-                    <div class="grid grid-cols-6 gap-1 p-4">
-                        <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
-                        <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+                    <!-- Токосъемные шины -->
+                    <div class="panel-component busbars" style="z-index: 2;">
+                        <div class="tooltip">
+                            Серебряные или алюминиевые проводники на поверхности элементов. Собирают электроны и направляют их во внешнюю цепь. Современные технологии используют микроскопические проводники для минимизации теневых потерь.
+                        </div>
                     </div>
-                </div>
-
-                <!-- Токосъемные шины -->
-                <div class="panel-component busbars" style="z-index: 2;">
-                    <div class="tooltip">
-                        Серебряные или алюминиевые проводники на поверхности элементов. Собирают электроны и направляют их во внешнюю цепь. Современные технологии используют микроскопические проводники для минимизации теневых потерь.
-                    </div>
-                </div>
-
-                <!-- Задний слой -->
-                <div class="panel-component backsheet" style="z-index: 1;">
-                    <div class="tooltip">
-                        Многослойный полимерный материал, защищающий тыльную сторону панели. Обеспечивает электрическую изоляцию и защиту от атмосферных воздействий. Часто имеет белый цвет для дополнительного отражения света.
+                    <!-- Задний слой -->
+                    <div class="panel-component backsheet" style="z-index: 1;">
+                        <div class="tooltip">
+                            Многослойный полимерный материал, защищающий тыльную сторону панели. Обеспечивает электрическую изоляцию и защиту от атмосферных воздействий. Часто имеет белый цвет для дополнительного отражения света.
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
-
         <!-- Научное описание -->
         <section class="section">
             <div class="card">
                 <h2 class="text-2xl font-bold mb-4">Как работает солнечная панель?</h2>
-                
                 <div class="grid md:grid-cols-2 gap-6">
                     <div>
                         <h3 class="text-xl font-semibold mb-2">Фотоэлектрический эффект</h3>
@@ -265,7 +228,6 @@
                             <p class="text-sm text-gray-600 mt-1">где h - постоянная Планка, f - частота света</p>
                         </div>
                     </div>
-                    
                     <div>
                         <h3 class="text-xl font-semibold mb-2">Квантовая эффективность</h3>
                         <p class="mb-4">
@@ -293,12 +255,10 @@
                 </div>
             </div>
         </section>
-
         <!-- Технические характеристики -->
         <section class="section">
             <div class="card">
                 <h2 class="text-2xl font-bold mb-4">Технические параметры типовой панели</h2>
-                
                 <div class="overflow-x-auto">
                     <table>
                         <thead>
@@ -357,11 +317,9 @@
                 </div>
             </div>
         </section>
-
         <!-- FAQ -->
         <section class="section">
             <h2 class="text-2xl font-bold mb-4">Часто задаваемые вопросы</h2>
-            
             <div class="space-y-4">
                 <div class="card">
                     <h3 class="text-xl font-semibold mb-2">Как влияет температура на эффективность?</h3>
@@ -369,14 +327,12 @@
                         Эффективность солнечных панелей снижается с ростом температуры. Типичный температурный коэффициент составляет -0.29%/°C. Это означает, что при нагреве панели до 65°C (на жаре) мощность снижается примерно на 12% по сравнению с номинальными значениями при 25°C.
                     </p>
                 </div>
-                
                 <div class="card">
                     <h3 class="text-xl font-semibold mb-2">Можно ли использовать панель в пасмурную погоду?</h3>
                     <p>
                         Да, панель будет работать при облачном небе, но мощность снизится пропорционально интенсивности света. При 20% освещенности (пасмурный день) панель выдает около 10-15% своей номинальной мощности.
                     </p>
                 </div>
-                
                 <div class="card">
                     <h3 class="text-xl font-semibold mb-2">Что происходит при повреждении стекла?</h3>
                     <p>
@@ -386,7 +342,6 @@
             </div>
         </section>
     </main>
-
     <footer>
         <div class="container mx-auto">
             <p>© 2023 Солнечные технологии. Все права защищены.</p>
