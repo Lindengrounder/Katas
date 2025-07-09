@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Солнечная панель</title>
+    <style>
+        :root {
+            --glass-color: #a5d8ff;
+            --eva-color: #ffe066;
+            --cells-color: #fde047;
+            --busbars-color: #d1d5db;
+            --backsheet-color: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #f0f9ff, #ffffff);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: #1d4ed8;
+            color: white;
+            padding: 1.5rem 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel-model {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            margin: 0 auto 3rem;
+            background: #bfdbfe;
+            border: 2px solid #e2e8f0;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        .panel-component {
+            position: absolute;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .panel-component:hover {
+            transform: scale(1.05);
+        }
+
+        .glass {
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 10%;
+            background: linear-gradient(to bottom, #dbeafe, #bfdbfe);
+        }
+
+        .eva {
+            top: 10%;
+            left: 0;
+            width: 100%;
+            height: 10%;
+            background: #fef9c3;
+        }
+
+        .cells {
+            top: 20%;
+            left: 0;
+            width: 100%;
+            height: 60%;
+            background: linear-gradient(to bottom, #fef08a, #fde047);
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 2px;
+            padding: 1rem;
+        }
+
+        .cell {
+            background: #facc15;
+            border-radius: 2px;
+        }
+
+        .busbars {
+            top: 60%;
+            left: 0;
+            width: 100%;
+            height: 2%;
+            background: #d1d5db;
+        }
+
+        .backsheet {
+            top: 80%;
+            left: 0;
+            width: 100%;
+            height: 10%;
+            background: #e5e7eb;
+        }
+
+        .tooltip {
+            position: absolute;
+            top: -120px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            max-width: 300px;
+            font-size: 0.875rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 10;
+        }
+
+        .tooltip::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: white transparent transparent transparent;
+        }
+
+        .panel-component:hover .tooltip {
+            opacity: 1;
+            transform: translate(-50%, -10px);
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        thead {
+            background-color: #bfdbfe;
+        }
+
+        footer {
+            background: #1d4ed8;
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1 class="text-3xl font-bold">Солнечная панель: устройство и принцип работы</h1>
+            <p class="mt-2 text-blue-100">Интерактивный научный справочник</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Интерактивная модель -->
+        <section class="section">
+            <div class="panel-model">
+                <!-- Стекло -->
+                <div class="panel-component glass" style="z-index: 5;">
+                    <div class="tooltip">
+                        Прозрачный защитный слой из закаленного стекла толщиной 3-4 мм. Обладает высокой механической прочностью и пропускает более 90% солнечного света. Поверхность часто покрыта антибликовым напылением для увеличения эффективности.
+                    </div>
+                </div>
+
+                <!-- EVA-пленка -->
+                <div class="panel-component eva" style="z-index: 4;">
+                    <div class="tooltip">
+                        Этиленвинилацетатная пленка (EVA) служит герметизирующим слоем. Она обладает высокой светопроницаемостью, устойчива к УФ-излучению и обеспечивает механическое соединение между стеклом и солнечными элементами.
+                    </div>
+                </div>
+
+                <!-- Фотоэлементы -->
+                <div class="panel-component cells" style="z-index: 3;">
+                    <div class="tooltip">
+                        Кремниевые полупроводниковые элементы, преобразующие солнечную энергию в электричество. Состоят из p-n перехода, где фотоны возбуждают электроны, создавая электрический ток. Эффективность монокристаллических элементов достигает 22-27%.
+                    </div>
+                    <div class="grid grid-cols-6 gap-1 p-4">
+                        <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+                        <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+                    </div>
+                </div>
+
+                <!-- Токосъемные шины -->
+                <div class="panel-component busbars" style="z-index: 2;">
+                    <div class="tooltip">
+                        Серебряные или алюминиевые проводники на поверхности элементов. Собирают электроны и направляют их во внешнюю цепь. Современные технологии используют микроскопические проводники для минимизации теневых потерь.
+                    </div>
+                </div>
+
+                <!-- Задний слой -->
+                <div class="panel-component backsheet" style="z-index: 1;">
+                    <div class="tooltip">
+                        Многослойный полимерный материал, защищающий тыльную сторону панели. Обеспечивает электрическую изоляцию и защиту от атмосферных воздействий. Часто имеет белый цвет для дополнительного отражения света.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Научное описание -->
+        <section class="section">
+            <div class="card">
+                <h2 class="text-2xl font-bold mb-4">Как работает солнечная панель?</h2>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-2">Фотоэлектрический эффект</h3>
+                        <p class="mb-4">
+                            При попадании фотонов солнечного света на поверхность кремниевого полупроводника (солнечного элемента) происходит выбивание электронов из кристаллической решетки кремния. Это создает электрический ток благодаря существованию p-n перехода.
+                        </p>
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h4 class="font-medium mb-2">Формула энергии фотона:</h4>
+                            <p class="text-center text-lg font-mono">E = h × f</p>
+                            <p class="text-sm text-gray-600 mt-1">где h - постоянная Планка, f - частота света</p>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-xl font-semibold mb-2">Квантовая эффективность</h3>
+                        <p class="mb-4">
+                            Современные монокристаллические элементы имеют квантовую эффективность до 90% в диапазоне видимого света. Это означает, что почти каждый фотон с энергией выше 1.1 эВ (длина волны < 1100 нм) генерирует электрон-дырочную пару.
+                        </p>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div class="bg-green-50 p-2 rounded">
+                                <div class="font-medium">Диапазон длин волн:</div>
+                                <div>350–1200 нм</div>
+                            </div>
+                            <div class="bg-green-50 p-2 rounded">
+                                <div class="font-medium">Макс. КПД:</div>
+                                <div>22–27%</div>
+                            </div>
+                            <div class="bg-green-50 p-2 rounded">
+                                <div class="font-medium">Температурный коэффициент:</div>
+                                <div>-0.29%/°C</div>
+                            </div>
+                            <div class="bg-green-50 p-2 rounded">
+                                <div class="font-medium">Срок службы:</div>
+                                <div>>25 лет</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Технические характеристики -->
+        <section class="section">
+            <div class="card">
+                <h2 class="text-2xl font-bold mb-4">Технические параметры типовой панели</h2>
+                
+                <div class="overflow-x-auto">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Параметр</th>
+                                <th>Значение</th>
+                                <th>Единица</th>
+                                <th>Примечание</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Номинальная мощность</td>
+                                <td>320</td>
+                                <td>Вт</td>
+                                <td>при STC (1000 Вт/м², 25°C, AM1.5)</td>
+                            </tr>
+                            <tr>
+                                <td>Напряжение при Pmax</td>
+                                <td>40.6</td>
+                                <td>В</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Ток при Pmax</td>
+                                <td>7.88</td>
+                                <td>А</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Напряжение холостого хода</td>
+                                <td>49.2</td>
+                                <td>В</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Ток короткого замыкания</td>
+                                <td>8.45</td>
+                                <td>А</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Размеры</td>
+                                <td>1700×1000×35</td>
+                                <td>мм</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Вес</td>
+                                <td>20.5</td>
+                                <td>кг</td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section class="section">
+            <h2 class="text-2xl font-bold mb-4">Часто задаваемые вопросы</h2>
+            
+            <div class="space-y-4">
+                <div class="card">
+                    <h3 class="text-xl font-semibold mb-2">Как влияет температура на эффективность?</h3>
+                    <p>
+                        Эффективность солнечных панелей снижается с ростом температуры. Типичный температурный коэффициент составляет -0.29%/°C. Это означает, что при нагреве панели до 65°C (на жаре) мощность снижается примерно на 12% по сравнению с номинальными значениями при 25°C.
+                    </p>
+                </div>
+                
+                <div class="card">
+                    <h3 class="text-xl font-semibold mb-2">Можно ли использовать панель в пасмурную погоду?</h3>
+                    <p>
+                        Да, панель будет работать при облачном небе, но мощность снизится пропорционально интенсивности света. При 20% освещенности (пасмурный день) панель выдает около 10-15% своей номинальной мощности.
+                    </p>
+                </div>
+                
+                <div class="card">
+                    <h3 class="text-xl font-semibold mb-2">Что происходит при повреждении стекла?</h3>
+                    <p>
+                        Разбитое стекло нарушает герметичность панели. Это приводит к проникновению влаги, что вызывает коррозию токоведущих элементов и снижение эффективности. Однако панель может продолжать работать в течение нескольких недель или месяцев, пока не произойдет серьезное повреждение внутренних компонентов.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container mx-auto">
+            <p>© 2023 Солнечные технологии. Все права защищены.</p>
+            <p class="text-blue-100 text-sm mt-1">Научно-образовательный портал</p>
+        </div>
+    </footer>
+</body>
+</html>
