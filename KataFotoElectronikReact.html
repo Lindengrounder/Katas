@@ -1,0 +1,287 @@
+import React, { useState } from 'react';
+
+export default function SolarPanelWebsite() {
+  const [hoveredComponent, setHoveredComponent] = useState(null);
+  
+  // Данные о компонентах панели
+  const panelComponents = [
+    {
+      id: 'glass',
+      name: 'Закаленное стекло',
+      position: { top: '10%', left: '50%' },
+      description: 'Прозрачный защитный слой из закаленного стекла толщиной 3-4 мм. Обладает высокой механической прочностью и пропускает более 90% солнечного света. Поверхность часто покрыта антибликовым напылением для увеличения эффективности.'
+    },
+    {
+      id: 'eva',
+      name: 'ЭВА-пленка',
+      position: { top: '35%', left: '30%' },
+      description: 'Этиленвинилацетатная пленка (EVA) служит герметизирующим слоем. Она обладает высокой светопроницаемостью, устойчива к УФ-излучению и обеспечивает механическое соединение между стеклом и солнечными элементами.'
+    },
+    {
+      id: 'cells',
+      name: 'Фотоэлектрические элементы',
+      position: { top: '45%', left: '60%' },
+      description: 'Кремниевые полупроводниковые элементы, преобразующие солнечную энергию в электричество. Состоят из p-n перехода, где фотоны возбуждают электроны, создавая электрический ток. Эффективность монокристаллических элементов достигает 22-27%.'
+    },
+    {
+      id: 'busbars',
+      name: 'Токосъемные шины',
+      position: { top: '55%', left: '45%' },
+      description: 'Серебряные или алюминиевые проводники на поверхности элементов. Собирают электроны и направляют их во внешнюю цепь. Современные технологии используют микроскопические проводники для минимизации теневых потерь.'
+    },
+    {
+      id: 'backsheet',
+      name: 'Задний слой',
+      position: { top: '80%', left: '70%' },
+      description: 'Многослойный полимерный материал, защищающий тыльную сторону панели. Обеспечивает электрическую изоляцию и защиту от атмосферных воздействий. Часто имеет белый цвет для дополнительного отражения света.'
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white font-sans">
+      {/* Шапка сайта */}
+      <header className="py-6 px-4 bg-blue-700 text-white shadow-lg">
+        <div className="container mx-auto">
+          <h1 className="text-3xl font-bold">Солнечная панель: устройство и принцип работы</h1>
+          <p className="text-blue-100 mt-2">Интерактивный научный справочник</p>
+        </div>
+      </header>
+
+      {/* Основной контент */}
+      <main className="container mx-auto px-4 py-12">
+        {/* 3D-модель панели */}
+        <section className="relative mb-16">
+          <div className="bg-gray-100 rounded-xl shadow-xl p-8 max-w-4xl mx-auto">
+            <h2 className="text-2xl font-bold mb-6">Интерактивная модель солнечной панели</h2>
+            
+            {/* Визуализация панели */}
+            <div className="relative w-full h-80 bg-blue-50 rounded-lg overflow-hidden border-2 border-gray-200">
+              {/* Стекло */}
+              <div 
+                id="glass"
+                className="absolute top-0 left-0 w-full h-2 bg-gradient-to-b from-blue-100 to-blue-200 cursor-pointer transition-transform hover:scale-105"
+                style={{ top: '0%', left: '0%', width: '100%', height: '10%' }}
+                onMouseEnter={() => setHoveredComponent('glass')}
+                onMouseLeave={() => setHoveredComponent(null)}
+              >
+                {hoveredComponent === 'glass' && (
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full bg-white p-3 rounded shadow-lg border border-gray-200 text-sm w-64 z-10">
+                    {panelComponents.find(c => c.id === 'glass').description}
+                  </div>
+                )}
+              </div>
+
+              {/* EVA-пленка */}
+              <div 
+                id="eva"
+                className="absolute top-0 left-0 w-full h-2 bg-yellow-50 cursor-pointer transition-transform hover:scale-105"
+                style={{ top: '10%', left: '0%', width: '100%', height: '10%' }}
+                onMouseEnter={() => setHoveredComponent('eva')}
+                onMouseLeave={() => setHoveredComponent(null)}
+              >
+                {hoveredComponent === 'eva' && (
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full bg-white p-3 rounded shadow-lg border border-gray-200 text-sm w-64 z-10">
+                    {panelComponents.find(c => c.id === 'eva').description}
+                  </div>
+                )}
+              </div>
+
+              {/* Фотоэлементы */}
+              <div 
+                id="cells"
+                className="absolute top-0 left-0 w-full h-60 bg-gradient-to-b from-yellow-100 to-yellow-200 cursor-pointer"
+                style={{ top: '20%', left: '0%', width: '100%', height: '60%' }}
+                onMouseEnter={() => setHoveredComponent('cells')}
+                onMouseLeave={() => setHoveredComponent(null)}
+              >
+                <div className="absolute inset-0 grid grid-cols-6 gap-1 p-4">
+                  {[...Array(12)].map((_, i) => (
+                    <div key={i} className="bg-amber-300 rounded-sm"></div>
+                  ))}
+                </div>
+                
+                {hoveredComponent === 'cells' && (
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full bg-white p-3 rounded shadow-lg border border-gray-200 text-sm w-64 z-10">
+                    {panelComponents.find(c => c.id === 'cells').description}
+                  </div>
+                )}
+              </div>
+
+              {/* Токосъемные шины */}
+              <div 
+                id="busbars"
+                className="absolute top-0 left-0 w-full h-1 bg-gray-300 cursor-pointer"
+                style={{ top: '60%', left: '0%', width: '100%', height: '2%' }}
+                onMouseEnter={() => setHoveredComponent('busbars')}
+                onMouseLeave={() => setHoveredComponent(null)}
+              >
+                {hoveredComponent === 'busbars' && (
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full bg-white p-3 rounded shadow-lg border border-gray-200 text-sm w-64 z-10">
+                    {panelComponents.find(c => c.id === 'busbars').description}
+                  </div>
+                )}
+              </div>
+
+              {/* Задний слой */}
+              <div 
+                id="backsheet"
+                className="absolute top-0 left-0 w-full h-2 bg-gray-200 cursor-pointer"
+                style={{ top: '80%', left: '0%', width: '100%', height: '10%' }}
+                onMouseEnter={() => setHoveredComponent('backsheet')}
+                onMouseLeave={() => setHoveredComponent(null)}
+              >
+                {hoveredComponent === 'backsheet' && (
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full bg-white p-3 rounded shadow-lg border border-gray-200 text-sm w-64 z-10">
+                    {panelComponents.find(c => c.id === 'backsheet').description}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Научное описание */}
+        <section className="mb-16">
+          <h2 className="text-2xl font-bold mb-6">Как работает солнечная панель?</h2>
+          
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h3 className="text-xl font-semibold mb-4">Фотоэлектрический эффект</h3>
+              <p className="mb-4">
+                При попадании фотонов солнечного света на поверхность кремниевого полупроводника (солнечного элемента) происходит выбивание электронов из кристаллической решетки кремния. Это создает электрический ток благодаря существованию p-n перехода.
+              </p>
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <h4 className="font-medium mb-2">Формула энергии фотона:</h4>
+                <p className="text-center text-lg font-mono">E = h × f</p>
+                <p className="text-sm text-gray-600 mt-1">где h - постоянная Планка, f - частота света</p>
+              </div>
+            </div>
+            
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h3 className="text-xl font-semibold mb-4">Квантовая эффективность</h3>
+              <p className="mb-4">
+                Современные монокристаллические элементы имеют квантовую эффективность до 90% в диапазоне видимого света. Это означает, что почти каждый фотон с энергией выше 1.1 эВ (длина волны < 1100 нм) генерирует электрон-дырочную пару.
+              </p>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="bg-green-50 p-2 rounded">
+                  <div className="font-medium">Диапазон длин волн:</div>
+                  <div>350–1200 нм</div>
+                </div>
+                <div className="bg-green-50 p-2 rounded">
+                  <div className="font-medium">Макс. КПД:</div>
+                  <div>22–27%</div>
+                </div>
+                <div className="bg-green-50 p-2 rounded">
+                  <div className="font-medium">Температурный коэффициент:</div>
+                  <div>-0.29%/°C</div>
+                </div>
+                <div className="bg-green-50 p-2 rounded">
+                  <div className="font-medium">Срок службы:</div>
+                  <div>>25 лет</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Технические характеристики */}
+        <section className="mb-16">
+          <h2 className="text-2xl font-bold mb-6">Технические параметры типовой панели</h2>
+          
+          <div className="overflow-x-auto">
+            <table className="w-full bg-white rounded-lg shadow-md overflow-hidden">
+              <thead className="bg-blue-100">
+                <tr>
+                  <th className="p-4 text-left">Параметр</th>
+                  <th className="p-4 text-left">Значение</th>
+                  <th className="p-4 text-left">Единица</th>
+                  <th className="p-4 text-left">Примечание</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                <tr>
+                  <td className="p-4">Номинальная мощность</td>
+                  <td className="p-4">320</td>
+                  <td className="p-4">Вт</td>
+                  <td className="p-4">при STC (1000 Вт/м², 25°C, AM1.5)</td>
+                </tr>
+                <tr>
+                  <td className="p-4">Напряжение при Pmax</td>
+                  <td className="p-4">40.6</td>
+                  <td className="p-4">В</td>
+                  <td className="p-4">—</td>
+                </tr>
+                <tr>
+                  <td className="p-4">Ток при Pmax</td>
+                  <td className="p-4">7.88</td>
+                  <td className="p-4">А</td>
+                  <td className="p-4">—</td>
+                </tr>
+                <tr>
+                  <td className="p-4">Напряжение холостого хода</td>
+                  <td className="p-4">49.2</td>
+                  <td className="p-4">В</td>
+                  <td className="p-4">—</td>
+                </tr>
+                <tr>
+                  <td className="p-4">Ток короткого замыкания</td>
+                  <td className="p-4">8.45</td>
+                  <td className="p-4">А</td>
+                  <td className="p-4">—</td>
+                </tr>
+                <tr>
+                  <td className="p-4">Размеры</td>
+                  <td className="p-4">1700×1000×35</td>
+                  <td className="p-4">мм</td>
+                  <td className="p-4">—</td>
+                </tr>
+                <tr>
+                  <td className="p-4">Вес</td>
+                  <td className="p-4">20.5</td>
+                  <td className="p-4">кг</td>
+                  <td className="p-4">—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section>
+          <h2 className="text-2xl font-bold mb-6">Часто задаваемые вопросы</h2>
+          
+          <div className="space-y-4">
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h3 className="text-xl font-semibold mb-2">Как влияет температура на эффективность?</h3>
+              <p>
+                Эффективность солнечных панелей снижается с ростом температуры. Типичный температурный коэффициент составляет -0.29%/°C. Это означает, что при нагреве панели до 65°C (на жаре) мощность снижается примерно на 12% по сравнению с номинальными значениями при 25°C.
+              </p>
+            </div>
+            
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h3 className="text-xl font-semibold mb-2">Можно ли использовать панель в пасмурную погоду?</h3>
+              <p>
+                Да, панель будет работать при облачном небе, но мощность снизится пропорционально интенсивности света. При 20% освещенности (пасмурный день) панель выдает около 10-15% своей номинальной мощности.
+              </p>
+            </div>
+            
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h3 className="text-xl font-semibold mb-2">Что происходит при повреждении стекла?</h3>
+              <p>
+                Разбитое стекло нарушает герметичность панели. Это приводит к проникновению влаги, что вызывает коррозию токоведущих элементов и снижение эффективности. Однако панель может продолжать работать в течение нескольких недель или месяцев, пока не произойдет серьезное повреждение внутренних компонентов.
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {/* Подвал */}
+      <footer className="py-6 px-4 bg-blue-700 text-white mt-16">
+        <div className="container mx-auto text-center">
+          <p>© 2023 Солнечные технологии. Все права защищены.</p>
+          <p className="text-blue-100 text-sm mt-1">Научно-образовательный портал</p>
+        </div>
+      </footer>
+    </div>
+  );
+}
