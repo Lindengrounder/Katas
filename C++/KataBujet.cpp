@@ -1,3 +1,4 @@
+/* протестировал 26.12.2025 на https://www.codechef.com/ide - ведет себя скверно, не получается вводить данные корректно*/
 #include <iostream>
 #include <vector>
 #include <string>
