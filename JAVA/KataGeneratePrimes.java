@@ -15,7 +15,7 @@ public class GeneratePrimes
     // Инициализировать массив значениями true
     for (i=0; i<s; i++)
       f[i] = true;
-    f[0] = f[1] = false
+    f[0] = f[1] = false;
 
     int j;
     for (i=2; i< Math.sqrt(s) +1; i++)
