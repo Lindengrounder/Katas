@@ -1,6 +1,15 @@
 // Пример со страницы 98 книги "Чистый Код" Роберта Мартина.
 import java.util.*;
 
+public class Main 
+{
+  public static void main (String[] args)
+  {
+    int[] primes = GenratePrimes.generatePrimes(1100);
+    System.out.println(Arrays.toString(primes));
+  }
+}
+
 public class GeneratePrimes
 {
   // @param maxValue - верхняя граница диапазона.
