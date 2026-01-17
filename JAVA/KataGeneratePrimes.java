@@ -5,7 +5,7 @@ public class KataGeneratePrimes
 {
   public static void main (String[] args)
   {
-    int[] primes = GeneratePrimes.generatePrimes(1100);
+    int[] primes = GeneratePrimes.generatePrimes(366);
     System.out.println(Arrays.toString(primes));
   }
 }
