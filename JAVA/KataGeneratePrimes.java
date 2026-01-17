@@ -1,4 +1,7 @@
 // Пример со страницы 98 книги "Чистый Код" Роберта Мартина.
+// Добавлен класс main для запуска в режиме одного файла
+// протестировано https://www.jdoodle.com/online-java-compiler
+// последний тест: 17.01.2026
 import java.util.*;
 
 public class KataGeneratePrimes
